@@ -1,0 +1,5 @@
+{
+  "name":"faculty-availability-system",
+  "private":true,
+  "dependencies":{"@netlify/blobs":"latest","xlsx":"latest"}
+}

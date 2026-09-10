@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Faculty Availability System</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#667085;--line:#e4e7ec;--brand:#2547c7;--good:#067647;--goodbg:#ecfdf3;--bad:#b42318;--badbg:#fef3f2;--warn:#b54708;--warnbg:#fffaeb}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,select{font:inherit}
+.header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.headin{max-width:1200px;margin:auto;padding:15px 20px;display:flex;justify-content:space-between;gap:20px}.brand{font-weight:800}.brand small{display:block;color:var(--muted);font-weight:500;margin-top:3px}.clock{text-align:right;font-variant-numeric:tabular-nums}.clock b{display:block}.clock span{font-size:12px;color:var(--muted)}
+.wrap{max-width:1200px;margin:auto;padding:28px 20px 50px}h1{margin:0 0 7px;font-size:32px}.lead{color:var(--muted);margin:0 0 22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 20px rgba(16,24,40,.05)}.controls{display:grid;grid-template-columns:1fr 150px;gap:12px}label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:10px;background:#fff}
+.status{margin-top:16px;padding:18px;border-radius:14px}.available{background:var(--goodbg);color:var(--good)}.busy{background:var(--badbg);color:var(--bad)}.outside{background:var(--warnbg);color:var(--warn)}.status h2{margin:0;font-size:25px}.status p{margin:6px 0 0}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip{background:#f2f4f7;color:#475467;border-radius:999px;padding:5px 9px;font-size:12px}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sectionhead h2{margin:0;font-size:18px}.count{font-weight:800}.facultylist{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;max-height:430px;overflow:auto}.person{padding:11px;border:1px solid var(--line);border-radius:12px;cursor:pointer}.person:hover{border-color:#8fa1ee}.person b{font-size:14px}.person small{display:block;color:var(--muted);margin-top:4px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#12b76a;margin-right:7px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid var(--line);padding:9px 7px;text-align:center}th{background:#f9fafb}td.day{text-align:left;font-weight:700;white-space:nowrap}.class{background:#fff4e5}.current{outline:2px solid var(--brand);outline-offset:-2px;background:#eef2ff!important}
+.admin{margin-top:18px}.adminpanel{display:none}.adminpanel.open{display:block}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{padding:11px 14px;border:0;border-radius:10px;font-weight:750;cursor:pointer}.primary{background:var(--brand);color:white}.secondary{background:#eef2ff;color:#25419e}.danger{background:#fef3f2;color:#b42318}.msg{margin-top:10px;font-size:13px}.muted{color:var(--muted)}.footer{font-size:12px;color:var(--muted);margin-top:18px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.facultylist{grid-template-columns:1fr}}@media(max-width:600px){.controls{grid-template-columns:1fr}h1{font-size:27px}.headin{align-items:flex-start}.clock{font-size:12px}}
+</style>
+</head>
+<body>
+<header class="header"><div class="headin"><div class="brand">School of Business & Management<small>Faculty Availability System</small></div><div class="clock"><b id="time">--</b><span id="date">--</span></div></div></header>
+<main class="wrap">
+<h1>Faculty Availability</h1><p class="lead">Check faculty availability using the current timetable and current date/time.</p>
+<div class="grid">
+<section class="card">
+<div class="controls">
+<div><label>Faculty name</label><input id="faculty" list="names" placeholder="Type a faculty name…" autocomplete="off"><datalist id="names"></datalist></div>
+<div><label>Campus</label><select id="campus"><option value="ALL">All campuses</option><option>BKC</option><option>BCC</option></select></div>
+</div>
+<div id="status" class="status outside"><h2>Select a faculty</h2><p>Availability will be calculated automatically.</p></div>
+<div id="chips" class="chips"></div>
+</section>
+<section class="card">
+<div class="sectionhead"><h2>Available Now</h2><span class="count" id="count">0</span></div>
+<div id="available" class="facultylist"></div>
+</section>
+</div>
+<section id="detail" class="card" style="display:none;margin-top:18px"><div class="sectionhead"><h2 id="detailTitle">Weekly timetable</h2></div><div style="overflow:auto"><table id="tt"></table></div></section>
+<section class="card admin">
+<div class="sectionhead"><h2>Administrator</h2><button id="toggle" class="btn secondary">Admin login</button></div>
+<div id="admin" class="adminpanel">
+<p class="muted">Upload the next trimester's Excel timetable. The update is stored centrally in Netlify and becomes available to all users.</p>
+<div class="row">
+<input id="password" type="password" placeholder="Admin password" style="max-width:240px">
+<input id="file" type="file" accept=".xlsx,.xls" style="max-width:300px">
+<button id="upload" class="btn primary">Publish timetable</button>
+</div>
+<div id="msg" class="msg"></div>
+</div>
+</section>
+<p class="footer" id="updated"></p>
+</main>
+<script>
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],SLOTS=["9.00 – 10.30","10.45-12.15","1.00 - 2.30","2.45 - 4.15"];
+let DATA=[];
+const $=x=>document.getElementById(x);
+function norm(s){return String(s||"").toLowerCase().replace(/^prof\.?\s*/,"").replace(/[^a-z0-9]+/g,"")}
+function slot(d){let m=d.getHours()*60+d.getMinutes();for(let i=0;i<SLOTS.length;i++){let x=SLOTS[i].match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);if(!x)continue;let a=x[1].replace(".",":").split(":").map(Number),b=x[2].replace(".",":").split(":").map(Number),sh=a[0],sm=a[1]||0,eh=b[0],em=b[1]||0;if(sh<8)sh+=12;if(eh<8)eh+=12;if(m>=sh*60+sm&&m<eh*60+em)return i}return -1}
+function day(d){return DAYS[d.getDay()-1]||"Sunday"}
+function list(){let c=$("campus").value;return DATA.filter(f=>c==="ALL"||f.campus===c)}
+function selected(){let q=norm($("faculty").value),a=list();return a.find(f=>norm(f.faculty)===q)||a.find(f=>q&&norm(f.faculty).includes(q))}
+function state(f,d){let i=slot(d),v=(f.days?.[day(d)]||[])[i]||"";return {i,v,busy:i>=0&&v.trim()}}
+function names(){let a=[...new Set(list().map(x=>x.faculty))].sort();$("names").innerHTML=a.map(x=>`<option value="${x}">`).join("")}
+function clock(d){$("time").textContent=d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit"});$("date").textContent=d.toLocaleDateString("en-IN",{weekday:"long",day:"2-digit",month:"short",year:"numeric"})}
+function available(d){let a=list().map(f=>({f,s:state(f,d)})).filter(x=>x.s.i>=0&&!x.s.busy);$("count").textContent=a.length;$("available").innerHTML=a.length?a.map(x=>`<div class="person" data-name="${encodeURIComponent(x.f.faculty)}"><b><span class="dot"></span>${x.f.faculty}</b><small>${x.f.campus} · ${SLOTS[x.s.i]}</small></div>`).join(""):`<div class="muted">No faculty are currently available during the active timetable period.</div>`;$("available").querySelectorAll(".person").forEach(e=>e.onclick=()=>{$("faculty").value=decodeURIComponent(e.dataset.name);render()})}
+function table(f,d){let dy=day(d),si=slot(d),h="<thead><tr><th>Day</th>"+SLOTS.map(x=>`<th>${x}</th>`).join("")+"</tr></thead><tbody>";["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].forEach(x=>{h+=`<tr><td class="day">${x}</td>`+(f.days[x]||["","","",""]).map((v,j)=>`<td class="${v?"class ":""}${x===dy&&j===si?"current":""}">${v||"—"}</td>`).join("")+"</tr>"});$("tt").innerHTML=h+"</tbody>";$("detailTitle").textContent=`${f.faculty} — Weekly timetable`;$("detail").style.display="block"}
+function render(){let d=new Date();clock(d);available(d);let f=selected();if(!f){$("status").className="status outside";$("status").innerHTML="<h2>Select a faculty</h2><p>Availability will be calculated automatically.</p>";$("chips").innerHTML="";$("detail").style.display="none";return}let s=state(f,d),cl=s.i<0?"outside":s.busy?"busy":"available";$("status").className="status "+cl;$("status").innerHTML=`<h2>${s.i<0?"OUTSIDE TIMETABLE":s.busy?"NOT AVAILABLE":"AVAILABLE"}</h2><p>${s.i<0?"No timetable teaching slot is active at the current time.":s.busy?`Busy: <b>${s.v}</b> · ${SLOTS[s.i]}`:`No class scheduled · ${SLOTS[s.i]}`}</p>`;$("chips").innerHTML=`<span class="chip">${f.faculty}</span><span class="chip">${f.campus}</span><span class="chip">${day(d)}</span>`;table(f,d)}
+async function load(){try{let r=await fetch("/api/timetable",{cache:"no-store"});let j=await r.json();if(!r.ok)throw Error(j.error||"Unable to load timetable");DATA=j.data||[];$("updated").textContent=j.updatedAt?"Timetable last published: "+new Date(j.updatedAt).toLocaleString("en-IN"):"Timetable loaded from deployment";names();render()}catch(e){$("msg").textContent=e.message}}
+$("faculty").oninput=render;$("campus").onchange=()=>{names();render()};$("toggle").onclick=()=>{$("admin").classList.toggle("open");$("toggle").textContent=$("admin").classList.contains("open")?"Hide admin":"Admin login"};
+$("upload").onclick=async()=>{let p=$("password").value,f=$("file").files[0];if(!p||!f){$("msg").textContent="Enter the admin password and choose an Excel file.";return}let fd=new FormData();fd.append("password",p);fd.append("file",f);$("msg").textContent="Publishing…";try{let r=await fetch("/api/timetable",{method:"POST",body:fd});let j=await r.json();if(!r.ok)throw Error(j.error||"Upload failed");$("msg").textContent=`Published successfully. ${j.count} faculty records loaded.`;$("password").value="";$("file").value="";await load()}catch(e){$("msg").textContent=e.message}};
+load();setInterval(render,1000);
+</script>
+</body></html>
